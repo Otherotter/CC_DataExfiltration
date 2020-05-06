@@ -1,36 +1,9 @@
 import socket, os, sys, signal, time
 
-master_pid = -1
-alarm_flag = 0
-
-def sigalrm_handler(signum, frame):
-    print('Signal handler called with signal', signum)
-    alarm_flag = 1
-
 def identify_client():
     print(socket.gethostbyname(socket.gethostname()))
 
-
 def client_program():
-    global master_pid, alarm_flag
-    print(socket.gethostbyname("www.google.com"))
-    a=socket.gethostbyaddr("18.218.176.168")
-    master_pid = os.getpid()
-    # print(a)
-    # print(socket.socket().connect(("18.218.176.168",80)))
-
-    n = os.fork()
-    if n == 0:
-        signal.alarm(1)
-        while(1):
-            if(alarm_flag ==1):
-                print("ASdf")
-                signal.alarm(1)
-                alarm_flag = 0
-
-   
-    
-
     host = socket.gethostname()  # as both code is running on same pc
     port = 5000  # socket server port number
 
@@ -54,7 +27,7 @@ def client_program():
 
         print('Received from server: ' + data)  # show in terminal
 
-        # message = input(" -> ")  # again take input
+        message = input(" -> ")  # again take input
 
     client_socket.close()  # close the connection
 
