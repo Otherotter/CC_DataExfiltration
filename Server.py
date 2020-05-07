@@ -92,9 +92,9 @@ class ClientInfo():
         self.center = cc
 
 
-    def elevatation(self, password : str):
+    def elevatation(self, password=None):
         print(password)
-        if(password == "AAAAA"):
+        if(password == "PASSWORD"):
             self.elevated = True 
             self.send_message("ACCESS GRANTED, WELCOME!")
             self.send_message(self.center.menu())
