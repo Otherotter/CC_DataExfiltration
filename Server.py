@@ -1,46 +1,45 @@
-import socket, os, sys, signal, time
+import socket
+import threading
+import socketserver
 
-cc_flag = 0
+class ThreadedServerHandler (socketserver.BaseRequestHandler):
+    def __init__(self, iterable):
+        print("INIT") 
 
-def echo(data):
-    return data
-
-def command_center():
-    menu = "\t> View Clients\t> Send Operation:\t>Help"
-    print("CommandCenter C&C:")
-    print(menu)
-    command = input()
-    if command == 0:
-        pass
-    elif command == 1:
-        pass
-    else:
-        pass
+    def handle(self):
+        print("HERE")
+        data = str(self.request.recv(1024), 'ascii')
+        cur_thread = threading.current_thread()
+        response = bytes("{}: {}".format(cur_thread.name, data), 'ascii')
+        self.request.sendall(response)
 
 
-def server_program():
-    host = socket.gethostname()
-    port = 5000  # initiate port no above 1024
-    time.sleep(1)
-    server_socket = socket.socket()  # get instance
-    server_socket.bind((host, port))  # bind host address and port together
-    server_socket.listen(1)
-    conn, address = server_socket.accept()  # accept new connection
-    print("Connection from: " + str(address))
-    while True:
-        # receive data stream. it won't accept data packet greater than 1024 bytes
-        data = conn.recv(1024).decode()
-        if not data:
-            if data is not received break
-             break
-        print("from connected user: " + str(data))
-        data = echo(data)
-  
-        conn.send(data.encode())  # send data to the client
+class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.host, self.port))
 
-    conn.close()  # close the connection
-        
+    def listen(self):
+        self.sock.listen(1)
+        while True:
+            client, address = self.sock.accept()
+            #client.settimeout()
+            threading.Thread(target = self.listenToClient,args = (client,address)).start()
 
-
-if __name__ == '__main__':
-    server_program()
+    def listenToClient(self, client, address):
+        size = 1024
+        while True:
+            try:
+                data = client.recv(size)
+                if data:
+                    # Set the response to echo back the recieved data 
+                    response = data
+                    client.send(response)
+                else:
+                    raise print('Client disconnected')
+            except:
+                client.close()
+                return False
