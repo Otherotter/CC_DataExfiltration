@@ -18,16 +18,18 @@ class CommandCenter():
         self.client_list = []
 
     def menu(self):
-        menu = "CC-DATA\n[CLIENTS : print clients]   [COMMAND <IP> <OPTION> <(optional)>: command client]\n\t<IP> : Type in client's IP to send to specific client. ALL to send to all clients\n\t<OPTION>: [echo] [send] [disconnect]"
+        menu = "CC-DATA\n[CLIENTS : print clients]   [COMMAND <IP> <OPTION> <(optional)>: command client]\n\t<IP> : Type in client's IP to send to specific client. ALL to send to all clients\n\t<OPTION>: [echo] [send] [disconnect]\n"
         return menu
 
     def clients(self, device):
         '''Prints all clients connected with the server'''
         if self.client_list == []:
-            device.send("NO CLIENTS")
+            device.send_message("NO CLIENTS")
         else:
+            print(len(self.client_list))
+            device.send_message(str(len(self.client_list)))
             for i in self.client_list:
-                device.send(i.ip)
+                device.send_message(i.ip)
 
     # def echo(self, device):
     #     '''The client should echo back with there IP'''
@@ -39,25 +41,36 @@ class CommandCenter():
     # def send(self, device, command):
     #     device.send(command)
     
-    def excute_command(self, device, command):
-        if command != "send":
-            device.send(command)
-        elif command != "disconnect":
+    def excute_command(self, device, command, optional=None):
+        
+        if command != "SEND" and command != "DISCONNECT" and command != "ECHO":
+            device.send_message(self.menu())
+            return
+
+        if command == "SEND" and optional != None:
+            device.send_message(optional)
+        elif command == "DISCONNECT":
             device.close()
         else:
-            device.send("echo")
+            device.send_message("ECHO")
 
-    def command(self, addr, command):
-        if command != "echo" or command != "send" or command != "disconnect":
-            menu()
+    def command(self, addr, command, optional=None):
+        print("command1")
+        print(addr)
+        print(command)
+        print(optional)
+        print(command != "ECHO")
+        if command != "ECHO" and command != "SEND" and command != "DISCONNECT":
+            self.menu()
             return
+        print("command2")
         if addr == "ALL":
             for i in self.client_list:
-                excute_command(i,command)
+                self.excute_command(i,command,optional)
         else:
             client = locateBy_(addr)
             if(client != None):
-                excute_command(client, command)
+                self.excute_command(client, command,optional)
 
 
     def insert(self, client):
@@ -75,7 +88,7 @@ class ClientInfo():
         self.elevated = False
         self.client = client
         self.address = address
-        self.ip = 0
+        self.ip = "IP" + str(address) 
         self.center = cc
 
 
@@ -83,29 +96,24 @@ class ClientInfo():
         print(password)
         if(password == "AAAAA"):
             self.elevated = True 
-            self.send("ACCESS GRANTED, WELCOME!", self.client)
-            self.send(self.center.menu(), self.client)
+            self.send_message("ACCESS GRANTED, WELCOME!")
+            self.send_message(self.center.menu())
         else:
             self.elevated = False
 
-            
 
-    def send(self, message, client):
+    def send_message(self, message):
         message = bytes(message,"utf-8")
-        client.send(message)
+        self.client.send(message)
         if type(message) is not bytes:
             message = bytes(message,"utf-8")
-            client.send(message)
+            self.client.send(message)
         else:
-            client.send(message)
+            self.client.send(message)
+    
+    def close(self):
+        self.client.close()
 
-
-    def handle(self):
-        print("HERE")
-        data = str(self.request.recv(1024), 'ascii')
-        cur_thread = threading.current_thread()
-        response = bytes("{}: {}".format(cur_thread.name, data), 'ascii')
-        self.request.sendall(response)
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -125,36 +133,37 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             threading.Thread(target = self.listenToClient, args = (client,address)).start()
 
     def parser(self,message,client_instance):
-        print("parse")
-        message = message[:20].split()
-        print(message[0] == "access" )
-        command = message[0]
-        if command == "ACCESS":
-            if(len(message) == 2):
-                client_instance.elevatation(message[1])
-        elif client_instance.elevatation:
-            if command == "CLIENTS":
-                if len(message) == 1:
-                    self.cc.clients(client_instance)
-            elif command == "COMMAND": 
-                if len(message) == 3 or len(message) == 4:
-                    self.cc.command(client_instance)
-            elif command == "DROP":
-                if len(message) == 1:
-                    client_instance.elevatation()
+        print(message)
+        message = message[:100].split()
+        print(message)
+        if message != []:
+            command = message[0]
+            if command == "ACCESS" and len(message) == 2:
+                    client_instance.elevatation(message[1])
+            elif client_instance.elevated:
+                print(client_instance.elevated)
+                if command == "CLIENTS" and len(message) == 1:
+                        self.cc.clients(client_instance)
+                elif command == "COMMAND": 
+                    if len(message) == 3:
+                        print("Commad")
+                        self.cc.command(message[1], message[2])
+                    elif len(message) == 4:
+                        self.cc.command(message[1], message[2], message[3])
+                elif command == "DROP" and len(message) == 1:
+                        client_instance.elevatation()
 
 
     def listenToClient(self, client, address):
         size = 1024
         client_instance = ClientInfo(client, address, self.cc)
         self.cc.insert(client_instance)
+        print("ADDED CLIENT: " + client_instance.ip)
         while True:
             data = client.recv(size)
             data = data.decode()
             if data:
-                print(str(data))
                 # Set the response to echo back the recieved data 
-                
                 self.parser(str(data), client_instance)
                 #response = data
                 #client.send(response)
