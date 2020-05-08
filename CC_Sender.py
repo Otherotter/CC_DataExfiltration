@@ -15,7 +15,7 @@ class CC_Sender:
             with open(self.file_input, 'rb') as f:
                 data = f.read()
 
-            self.raw_bits = self.prepare_data(data)
+            self.raw_bits = self.create_data(data)
 
         def send_packet(self):
             position = 0
@@ -58,7 +58,7 @@ class CC_Sender:
 
             return raw_bits
 
-        def bitfield(n):
+        def bitfield(self, n):
 
             bits = [int(digit) for digit in bin(n)[2:]]
             padded_bits = [0] * (8 - len(bits)) + bits

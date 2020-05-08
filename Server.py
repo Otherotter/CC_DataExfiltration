@@ -2,6 +2,10 @@ import socket
 import threading
 import socketserver
 
+from scapy.layers.http import HTTP, HTTPRequest
+from scapy.sendrecv import send
+
+
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
     def __init__(self, iterable):
         print("INIT") 
@@ -114,6 +118,12 @@ class ClientInfo():
     def close(self):
         self.client.close()
 
+    def send_cc_message(self, message):
+        if len(message.encode('utf-8')) <= 1024:
+            packet = HTTP() / HTTPRequest(
+                referer=message
+            )
+            self.send_message(packet)
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
