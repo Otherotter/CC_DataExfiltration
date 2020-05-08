@@ -92,7 +92,7 @@ class ClientInfo():
         self.center = cc
 
 
-    def elevatation(self, password=None):
+    def elevatation(self, passwoCrd=None):
         print(password)
         if(password == "PASSWORD"):
             self.elevated = True 

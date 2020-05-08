@@ -37,7 +37,6 @@ def main(parser):
             elif(options == 'n'):
                 hostname = args
     server()
-    
 
 if __name__ == "__main__":
     parser = init()
