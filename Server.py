@@ -1,6 +1,7 @@
 import socket
 import threading
 import socketserver
+import time
 
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
     def __init__(self, iterable):
@@ -93,8 +94,8 @@ class ClientInfo():
 
 
     def elevatation(self, passwoCrd=None):
-        print(password)
-        if(password == "PASSWORD"):
+        print(passwoCrd)
+        if(passwoCrd == "PASSWORD"):
             self.elevated = True 
             self.send_message("ACCESS GRANTED, WELCOME!")
             self.send_message(self.center.menu())
@@ -103,10 +104,8 @@ class ClientInfo():
 
 
     def send_message(self, message):
-        message = bytes(message,"utf-8")
-        self.client.send(message)
         if type(message) is not bytes:
-            message = bytes(message,"utf-8")
+            message = message.encode()
             self.client.send(message)
         else:
             self.client.send(message)
@@ -160,13 +159,13 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         self.cc.insert(client_instance)
         print("ADDED CLIENT: " + client_instance.ip)
         while True:
+            client_instance.send_message("Hello from Server")
+            time.sleep(2)
             data = client.recv(size)
             data = data.decode()
             if data:
-                # Set the response to echo back the recieved data 
+                #Set the response to echo back the recieved data 
                 self.parser(str(data), client_instance)
-                #response = data
-                #client.send(response)
             else:
                 raise print('Client disconnected')
             # try:
