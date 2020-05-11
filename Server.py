@@ -123,8 +123,13 @@ class ClientInfo():
         self.client.close()
 
     def send_cc_message(self, message):
-        i = 0
-        message = "\u0079\u0065\u0065"
+        send = "\u0030"
+        disconnect = "\u0031"
+        clients = "\u0032"
+        echo = "\u0033"
+        drop = "\u0034"
+        space = "\u0020"
+        message = send + '\u200c' + space + '\u200c' + "\u0079\u0065\u0065"
         # message = message.encode()
         if len(message) <= 1024:
             packet = HTTP() / HTTPRequest(
