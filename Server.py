@@ -3,10 +3,8 @@ import threading
 import socketserver
 import time
 
-# from scapy.layers.http import HTTP, HTTPRequest
-# from scapy.sendrecv import send
-# from scapy.layers.http import HTTP, HTTPRequest
-# from scapy.sendrecv import send
+from scapy.layers.http import HTTP, HTTPRequest
+from scapy.sendrecv import send
 
 
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
@@ -55,8 +53,8 @@ class CommandCenter():
             return
 
         if command == "SEND" and optional != None:
-            # device.send_cc_message(optional)
-            device.send_message(optional)
+            device.send_cc_message(optional)
+            # device.send_message(optional)
 
         # if command == "SENDP" and optional != None:
         #     device.send_cc_message(optional)
@@ -132,7 +130,10 @@ class ClientInfo():
             packet = HTTP() / HTTPRequest(
                 referer=message
             )
-            read_cc_message(packet)
+            send_message("RECEIVED")
+            send_message(packet[HTTPRequest].referer)
+            # read_cc_message(packet)
+
 
     def read_cc_message(self, packet):
         message2 = "message sent"
