@@ -2,15 +2,8 @@ import socket
 import threading
 import socketserver
 import time
-
-from scapy.layers.http import HTTP, HTTPRequest
-from scapy.layers.inet import IP
-from scapy.sendrecv import send
-from scapy.all import *
-
 from Conversions import *
 
-load_layer('http')
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
     def __init__(self, iterable):
         print("INIT") 
@@ -89,7 +82,6 @@ class CommandCenter():
             if(client != None):
                 self.excute_command(client, command,optional)
 
-
     def insert(self, client):
         self.client_list.append(client)
     
@@ -98,17 +90,6 @@ class CommandCenter():
             for i in self.client_list:
                 if i.ip == search:
                     return i
-
-    def construct_packet(self, ip, command, message=None):
-        r_input = binary_converter(command + ' ' + message)
-        print(r_input)
-        r_input = binary_to_unicode(r_input)
-        print(r_input)
-
-        packet = IP(dst=ip)/HTTP()/HTTPRequest(
-                    Referer=command
-                )
-        return bytes(packet)
 
 class ClientInfo():
     def __init__(self, client, address):

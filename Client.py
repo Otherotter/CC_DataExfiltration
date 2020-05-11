@@ -38,6 +38,7 @@ def client_program():
     threading.Thread(target = client, args = ()).start()
     while 1:
         i = input()
+        i = i.split()
         client_socket.send(i.encode())
         print(i)
 
