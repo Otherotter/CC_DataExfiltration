@@ -44,7 +44,7 @@ def binary_converter(message):
         res = drop
         command_len = len(msg_list[0]) + 1
         message = message[command_len:]
-    res += ''.join(format(ord(i), 'b') for i in message)
+    res += ''.join(format(ord(i), '08b') for i in message)
 
     return res
     # binary_to_unicode(res)
@@ -72,6 +72,8 @@ def unicode_to_binary(message):
             final_final_res += "1"
         index1 += 3
         index2 += 3
+
+    return final_final_res
 
 def parser(self,message,client_instance):
         print(message)
@@ -108,4 +110,4 @@ def construct_packet(self, ip, command, message=None):
 
 def deconstruct_packet(self, packet):
     message = packet[HTTPRequest].Referer
-    message =  unicode_to_binary(message.encode())
+    message = unicode_to_binary(message.encode())
