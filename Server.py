@@ -4,8 +4,11 @@ import socketserver
 import time
 
 from scapy.layers.http import HTTP, HTTPRequest
+from scapy.layers.inet import IP
 from scapy.sendrecv import send
-from  scapy.all import * 
+from scapy.all import *
+
+from Conversions import *
 
 load_layer('http')
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
@@ -97,7 +100,11 @@ class CommandCenter():
                     return i
 
     def construct_packet(self, ip, command, message=None):
-        #MARCFUNCTON
+        r_input = binary_converter(command + ' ' + message)
+        print(r_input)
+        r_input = binary_to_unicode(r_input)
+        print(r_input)
+
         packet = IP(dst=ip)/HTTP()/HTTPRequest(
                     Referer=command
                 )
@@ -236,3 +243,4 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             #     print("something happends")
             #     #client.close()
             #     #return False
+

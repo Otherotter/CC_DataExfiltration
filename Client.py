@@ -1,6 +1,8 @@
 import socket, os, sys, signal, time, argparse
 import threading
 import selectors
+from Conversions import *
+
 cc_flag = 0
 helpMenuDescription = "Run the client"
 port_help = "Enter a port number of your choosing"
