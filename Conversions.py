@@ -104,3 +104,8 @@ def construct_packet(self, ip, command, message=None):
                     Referer=command
                 )
         return bytes(packet)
+
+
+def deconstruct_packet(self, packet):
+    message = packet[HTTPRequest].Referer
+    message =  unicode_to_binary(message.encode())
