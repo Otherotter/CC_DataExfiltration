@@ -3,8 +3,10 @@ import threading
 import socketserver
 import time
 
-from scapy.layers.http import HTTP, HTTPRequest
-from scapy.sendrecv import send
+# from scapy.layers.http import HTTP, HTTPRequest
+# from scapy.sendrecv import send
+# from scapy.layers.http import HTTP, HTTPRequest
+# from scapy.sendrecv import send
 
 
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
@@ -53,7 +55,12 @@ class CommandCenter():
             return
 
         if command == "SEND" and optional != None:
+            # device.send_cc_message(optional)
             device.send_message(optional)
+
+        # if command == "SENDP" and optional != None:
+        #     device.send_cc_message(optional)
+
         elif command == "DISCONNECT":
             device.close()
         else:
@@ -113,16 +120,31 @@ class ClientInfo():
             self.client.send(message)
         else:
             self.client.send(message)
-    
+
     def close(self):
         self.client.close()
 
     def send_cc_message(self, message):
-        if len(message.encode('utf-8')) <= 1024:
+        i = 0
+        message = "\u0079\u0065\u0065"
+        # message = message.encode()
+        if len(message) <= 1024:
             packet = HTTP() / HTTPRequest(
                 referer=message
             )
-            self.send_message(packet)
+            read_cc_message(packet)
+
+    def read_cc_message(self, packet):
+        message2 = "message sent"
+        message = packet[HTTPRequest].referer
+        if type(message) is not bytes:
+            message2 = message2.encode()
+            self.client.send(message2)
+            message = message.encode('utf-8', 'ignore')
+            self.client.send(message)
+        else:
+            self.client.send(message2)
+            self.client.send(message)
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
