@@ -1,8 +1,8 @@
-from scapy.layers.http import HTTP, HTTPRequest
-from scapy.layers.inet import IP
-from scapy.sendrecv import send
-from scapy.all import *
-load_layer('http')
+# from scapy.layers.http import HTTP, HTTPRequest
+# from scapy.layers.inet import IP
+# from scapy.sendrecv import send
+# from scapy.all import *
+# load_layer('http')
 
 zero = '\u200c'  # 0
 one = '\u200d'  # 1
@@ -12,39 +12,32 @@ disconnect = "0001"
 clients = "0010"
 echo = "0011"
 drop = "0100"
+ALL = "0101"
 
-res = ''
+
 final_res = ''
 final_final_res = ''
 
 ''' CONTIANS CODE USED BY BOTH SERVER AND CLIENT'''
 def binary_converter(message):
-    global res
-
+    res = ''
     message2 = message
     msg_list = message2.split()
-
-    if msg_list[0] == 'SEND':
-        res = send
-        command_len = len(msg_list[0]) + 1
-        message = message[command_len:]
-    elif msg_list[0] == 'DISCONNECT':
-        res = disconnect
-        command_len = len(msg_list[0]) + 1
-        message = message[command_len:]
-    elif msg_list[0] == 'CLIENTS':
-        res = clients
-        command_len = len(msg_list[0]) + 1
-        message = message[command_len:]
-    elif msg_list[0] == 'ECHO':
-        res = echo
-        command_len = len(msg_list[0]) + 1
-        message = message[command_len:]
+    if msg_list[0] == 'ALL':
+        res = ALL
+        if msg_list[1] == 'SEND':
+            res = res + send
+            command_len = 9 # len('ALL SEND') + 1
+            message = message[command_len:]
+            res = res + ''.join(format(ord(i), '08b') for i in message)
+        elif msg_list[1] == 'ECHO':
+            res = res + echo
+        elif msg_list[1] == 'DISCONNECT':
+            res = res + disconnect
     elif msg_list[0] == 'DROP':
         res = drop
-        command_len = len(msg_list[0]) + 1
-        message = message[command_len:]
-    res += ''.join(format(ord(i), '08b') for i in message)
+    elif msg_list[0] == 'CLIENTS':
+        res = clients
 
     return res
     # binary_to_unicode(res)
