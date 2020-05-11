@@ -5,8 +5,9 @@ import time
 
 from scapy.layers.http import HTTP, HTTPRequest
 from scapy.sendrecv import send
+from  scapy.all import * 
 
-
+load_layer('http')
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
     def __init__(self, iterable):
         print("INIT") 
@@ -53,15 +54,18 @@ class CommandCenter():
             return
 
         if command == "SEND" and optional != None:
-            device.send_cc_message(optional)
-            # device.send_message(optional)
+            packet = self.construct_packet(device.ip, command, optional)
+            #device.send_cc_message(packet)
+            device.send_message(optional)
 
         # if command == "SENDP" and optional != None:
         #     device.send_cc_message(optional)
 
         elif command == "DISCONNECT":
+            packet = self.construct_packet(device.ip, command, optional)
             device.close()
         else:
+            packet = self.construct_packet(device.ip, command, optional)
             device.send_message("ECHO")
 
     def command(self, addr, command, optional=None):
@@ -92,14 +96,20 @@ class CommandCenter():
                 if i.ip == search:
                     return i
 
+    def construct_packet(self, ip, command, message=None):
+        #MARCFUNCTON
+        packet = IP(dst=ip)/HTTP()/HTTPRequest(
+                    Referer=command
+                )
+        return bytes(packet)
 
 class ClientInfo():
-    def __init__(self, client, address, cc):
+    def __init__(self, client, address):
         self.elevated = False
         self.client = client
         self.address = address
-        self.ip = "IP" + str(address) 
-        self.center = cc
+        self.ip = address[0] 
+        self.cc = CommandCenter()
 
 
     def elevatation(self, passwoCrd=None):
@@ -121,6 +131,7 @@ class ClientInfo():
 
     def close(self):
         self.client.close()
+
 
     def send_cc_message(self, message):
         send = "\u0030"
@@ -193,11 +204,14 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
     def listenToClient(self, client, address):
         size = 1024
-        client_instance = ClientInfo(client, address, self.cc)
+        client_instance = ClientInfo(client, address)
         self.cc.insert(client_instance)
         print("ADDED CLIENT: " + client_instance.ip)
         while True:
-            client_instance.send_message("Hello from Server")
+            #client_instance.send_message("Hello from Server")
+            #packet = HTTP()/HTTPRequest(Referer="\u200d")
+            #p = bytes(packet)
+            #client.send(p)
             time.sleep(2)
             data = client.recv(size)
             data = data.decode()
