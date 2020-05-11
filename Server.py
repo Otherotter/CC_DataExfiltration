@@ -128,16 +128,16 @@ class ClientInfo():
         # message = message.encode()
         if len(message) <= 1024:
             packet = HTTP() / HTTPRequest(
-                referer=message
+                Referer=message
             )
-            send_message("RECEIVED")
-            send_message(packet[HTTPRequest].referer)
+            self.send_message("RECEIVED")
+            self.send_message(packet[HTTPRequest].Referer)
             # read_cc_message(packet)
 
 
     def read_cc_message(self, packet):
         message2 = "message sent"
-        message = packet[HTTPRequest].referer
+        message = packet[HTTPRequest].Referer
         if type(message) is not bytes:
             message2 = message2.encode()
             self.client.send(message2)
