@@ -38,6 +38,11 @@ def binary_converter(message):
         res = clients
     elif msg_list[0] == 'ACCESS':
         res = access + ''.join(format(ord(i), '08b') for i in message[7:])
+    elif msg_list[0] == 'SEND':
+        res = send
+        command_len = 5  # len('SEND') + 1
+        message = message[command_len:]
+        res = res + ''.join(format(ord(i), '08b') for i in message)
     else:
         res = ''.join(format(ord(i), '08b') for i in msg_list[0])
         if msg_list[1] == 'SEND':
@@ -125,6 +130,17 @@ def binary_deconverter(message):
             index1 += 8
             index2 += 8
         return command + ' ' + password
+    elif message[0:4] == "0000":
+        command = "SEND"
+        new_message = ''
+        index1 = 4
+        index2 = 12
+        while index1 < len(message):
+            character = chr(int(message[index1:index2], 2))
+            new_message += character
+            index1 += 8
+            index2 += 8
+        return command + ' ' + new_message
     else:
         index1 = 0
         index2 = 8
@@ -192,7 +208,7 @@ def deconstruct_packet(packet):
     # print(packet)
     packet = HTTPRequest(packet)
     message = packet[HTTPRequest].Referer
-    print("CHECK5 " + message.encode())
+    #print("CHECK5 " + message.encode())
     message = unicode_to_binary(message)
     print("CHECK5 " + message)
     message = binary_deconverter(message)
