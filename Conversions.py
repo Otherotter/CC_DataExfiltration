@@ -37,7 +37,7 @@ def binary_converter(message):
     elif msg_list[0] == 'CLIENTS':
         res = clients
     elif msg_list[0] == 'ACCESS':
-        res = access + msg_list[1]
+        res = access + ''.join(format(ord(i), '08b') for i in msg_list[1])
     else:
         res = ''.join(format(ord(i), '08b') for i in msg_list[0])
         if msg_list[1] == 'SEND':
@@ -116,7 +116,15 @@ def binary_deconverter(message):
         return command
     elif message[0:4] == "0101":
         command = "ACCESS"
-        return command
+        password = ''
+        index1 = 4
+        index2 = 12
+        while index1 < len(message):
+            character = chr(int(message[index1:index2], 2))
+            password += character
+            index1 += 8
+            index2 += 8
+        return command + ' ' + password
     else:
         index1 = 0
         index2 = 8
@@ -152,18 +160,18 @@ def construct_packet(addr, input):
     r_input = binary_converter(input)
     if r_input == None:
         return
-    print(r_input)
+    # print(r_input)
     r_input = binary_to_unicode(r_input)
     if r_input == None:
         return
-    print(r_input)
+    # print(r_input)
 
-    packet = IP(dst=addr[0], sport=addr[1])/HTTP()/HTTPRequest(
+    packet = IP(dst=addr[0])/HTTP()/HTTPRequest(
                 Referer=r_input
             )
     return bytes(packet)
 
-def deconstruct_packet(self, packet):
+def deconstruct_packet(packet):
     message = packet[HTTPRequest].Referer
     message = unicode_to_binary(message.encode())
     message = binary_deconverter(message)
