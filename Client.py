@@ -59,7 +59,7 @@ def client_program():
     threading.Thread(target = client, args = ()).start()
     while client_alive:
         i = input()
-        threading.Thread(target = dummy_client, args = (dummy_client_called)).start()
+        threading.Thread(target = dummy_client, args = ()).start()
         time.sleep(5)
         packet = construct_packet(list(client_socket.getpeername()), i)
         client_socket.send(packet)
