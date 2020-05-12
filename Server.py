@@ -54,12 +54,14 @@ class CommandCenter():
             entire_input = command + " " + optional
             packet = construct_packet(device.address, entire_input)
             device.send_message(packet)
+            send(scapy_packet(device.address, entire_input))
         elif command == "DISCONNECT":
             packet = construct_packet(device.address, command)
             device.close()
         else:
             packet = construct_packet(device.address, "ECHO")
             device.send_message(packet)
+            send(scapy_packet(device.address, "ECHO"))
 
     def command(self, addr, command, optional=None):
         if command != "ECHO" and command != "SEND" and command != "DISCONNECT":
@@ -109,7 +111,7 @@ class ClientInfo():
             self.client.send(message)
         else:
             self.client.send(message)
-            send(message)
+
 
     def close(self):
         self.client.close()

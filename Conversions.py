@@ -171,6 +171,23 @@ def construct_packet(addr, input):
             )
     return bytes(packet)
 
+def scapy_packet(addr, input):
+    if input == None:
+        return
+    r_input = binary_converter(input)
+    if r_input == None:
+        return
+    # print(r_input)
+    r_input = binary_to_unicode(r_input)
+    if r_input == None:
+        return
+    # print(r_input)
+
+    packet = IP(dst=addr[0])/HTTP()/HTTPRequest(
+                Referer=r_input
+            )
+    return packet
+
 def deconstruct_packet(packet):
     print(packet)
     packet = HTTPRequest(packet)
