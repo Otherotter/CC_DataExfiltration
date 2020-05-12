@@ -11,6 +11,9 @@ hostname_help = "Enter a hostname of your choosing"
 port = 2000
 hostname = "localhost"
 client_socket = None
+dummy_client_called = 0
+client_alive = True
+
 
 def identify_client():
     print(socket.gethostbyname(socket.gethostname()))
@@ -20,30 +23,36 @@ def client_input(client_socket):
     a = input()
     print(a)
 
-
-
 def client():
-    global client_socket, port, hostname # contains hostname and port number
-    client_socket = socket.socket()  # instantiate
-    #client_socket.settimeout()
-    client_socket.connect((hostname, port))  # connect to the server
-    identify_client()
-    while 1:
-        packet = client_socket.recv(1024)  # receive response
-        data = deconstruct_packet(packet)
-        if not data:
-            continue  # if data is not received break
-        print('Received from server: ' + data)  # show in terminal
-    client_socket.close()  # close the connection
+    global client_socket, port, hostname,dummy_client_called,client_alive # contains hostname and port number
+    try:
+        client_socket = socket.socket()  # instantiate
+        #client_socket.settimeout()
+        client_socket.connect((hostname, port))  # connect to the server
+        identify_client()
+        while 1:
+            packet = client_socket.recv(1024)  # receive response
+            data = deconstruct_packet(packet)
+            if not data:
+                continue  # if data is not received break
+            print('Received from server: ' + data)  # show in terminal
+    except:
+        client_socket.close()  # close the connection
+        client_alive = False
 
 def client_program():
+    global dummy_client_called, client_alive
     threading.Thread(target = client, args = ()).start()
-    while 1:
+    while client_alive:
         i = input()
+        threading.Thread(target = dummy_client, args = (dummy_client_called)).start()
+        time.sleep(5)
         packet = construct_packet(list(client_socket.getpeername()), i)
-        threading.Thread(target = dummy_client, args = ()).start()
         client_socket.send(packet)
+        dummy_client_called = dummy_client_called + 1
         #print(i)
+    print("CLIENT DISCONNENTED")
+    exit()
 
 def init():
     parser = argparse.ArgumentParser(prog="CommandCenter", description=helpMenuDescription)
