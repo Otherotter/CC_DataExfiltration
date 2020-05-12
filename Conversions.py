@@ -158,7 +158,7 @@ def construct_packet(addr, input):
         return
     print(r_input)
 
-    packet = IP(dst=addr[0], port=addr[1])/HTTP()/HTTPRequest(
+    packet = IP(dst=addr[0], sport=addr[1])/HTTP()/HTTPRequest(
                 Referer=r_input
             )
     return bytes(packet)
