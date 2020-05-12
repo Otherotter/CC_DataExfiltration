@@ -27,10 +27,11 @@ def client():
     client_socket.connect((hostname, port))  # connect to the server
     identify_client()
     while 1:
-        data = client_socket.recv(1024).decode()  # receive response
+        data = client_socket.recv(1024)  # receive response
         if not data:
             continue  # if data is not received break
-        print('Received from server: ' + data)  # show in terminal
+        print('Received from server: ')
+        print(data)  # show in terminal
 
 
     client_socket.close()  # close the connection
