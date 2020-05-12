@@ -43,12 +43,12 @@ class CommandCenter():
         
         if command == "SEND" and optional != None:
             entire_input = command + " " + optional
-            print("DEBUG5: " + entire_input)
             packet = construct_packet(device.address, entire_input)
             device.send_message(packet)
             send(scapy_packet(device.address, entire_input))
         elif command == "DISCONNECT":
             packet = construct_packet(device.address, command)
+            time.sleep(5)
             device.close()
         else:
             packet = construct_packet(device.address, "ECHO")
@@ -141,7 +141,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                 elif first == "DROP" and len(message) == 1:
                         client_instance.elevatation()
                 elif message_list[1] == "ECHO" or message_list[1] == "SEND" or message_list[1] == "DISCONNECT":
-                    if len(message_list) == 3:
+                    if len(message_list) >= 3:
                         #SEND
                         index = len(message_list[0] + message_list[1]) + 2
                         self.cc.command(message_list[0], message_list[1], message[index:])

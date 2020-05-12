@@ -193,11 +193,9 @@ def construct_packet(addr, input):
     if input == None:
         return
     r_input = binary_converter(input)
-    print("DEBUG1: " + r_input)
     if r_input == None:
         return
     r_input = binary_to_unicode(r_input)
-    print("DEBUG2: " + r_input)
     if r_input == None:
         return
     packet = IP(dst=addr[0])/HTTP()/HTTPRequest(
@@ -226,9 +224,7 @@ def deconstruct_packet(packet):
     # print(packet)
     packet = HTTPRequest(packet)
     message = packet[HTTPRequest].Referer
-    print("DEBUG3: " + message)
     message = unicode_to_binary(message)
-    print("DEBUG4: " + message)
     message = binary_deconverter(message)
     return message
 
