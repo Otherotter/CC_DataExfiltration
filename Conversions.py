@@ -2,7 +2,7 @@
 # from scapy.layers.inet import IP
 # from scapy.sendrecv import send
 # from scapy.all import *
-load_layer('http')
+#load_layer('http')
 
 zero = '\u200c'  # 0
 one = '\u200d'  # 1

