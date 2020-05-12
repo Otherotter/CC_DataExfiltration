@@ -60,7 +60,6 @@ def client_program():
     while client_alive:
         i = input()
         threading.Thread(target = dummy_client, args = ()).start()
-        time.sleep(5)
         packet = construct_packet(list(client_socket.getpeername()), i)
         client_socket.send(packet)
         dummy_client_called = dummy_client_called + 1
