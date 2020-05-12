@@ -38,8 +38,8 @@ def client_program():
     threading.Thread(target = client, args = ()).start()
     while 1:
         i = input()
-        i = i.split()
-        client_socket.send(i.encode())
+        packet = construct_packet('127.0.0.1', i)
+        client_socket.send(packet)
         print(i)
 
 def init():
