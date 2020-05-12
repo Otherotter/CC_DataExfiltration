@@ -29,6 +29,7 @@ def client():
     while 1:
         packet = client_socket.recv(1024)  # receive response
         data = deconstruct_packet(packet)
+        print("CHECK4 " + data)
         if not data:
             continue  # if data is not received break
         print('Received from server: ' + data)  # show in terminal
@@ -41,6 +42,7 @@ def client_program():
     threading.Thread(target = client, args = ()).start()
     while 1:
         i = input()
+        print("CHECK3 " + i)
         packet = construct_packet(list(client_socket.getpeername()), i)
         client_socket.send(packet)
         #print(i)
