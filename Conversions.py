@@ -172,7 +172,9 @@ def construct_packet(addr, input):
     return bytes(packet)
 
 def deconstruct_packet(packet):
+    print(packet)
+    packet = HTTPRequest(packet)
     message = packet[HTTPRequest].Referer
-    message = unicode_to_binary(message.encode())
+    message = unicode_to_binary(message)
     message = binary_deconverter(message)
     return message

@@ -92,11 +92,11 @@ class ClientInfo():
 
 
     def elevatation(self, passwoCrd=None):
-        print(passwoCrd)
+        #print(passwoCrd)
         if(passwoCrd == "PASSWORD"):
             self.elevated = True 
             self.send_message("ACCESS GRANTED, WELCOME!")
-            self.send_message(self.center.menu())
+            self.send_message(self.cc.menu())
         else:
             self.elevated = False
 
@@ -160,9 +160,9 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             threading.Thread(target = self.listenToClient, args = (client,address)).start()
 
     def parser(self,message,client_instance):
-        print(message)
+        #print(message)
         message_list = message.split()
-        print(message)
+        print("[PARSER]" + message)
         if message != []:
             first = message_list[0]
             if first == "ACCESS" and len(message_list) == 2:

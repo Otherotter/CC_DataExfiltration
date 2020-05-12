@@ -40,7 +40,7 @@ def client_program():
         i = input()
         packet = construct_packet(list(client_socket.getpeername()), i)
         client_socket.send(packet)
-        print(i)
+        #print(i)
 
 def init():
     parser = argparse.ArgumentParser(prog="CommandCenter", description=helpMenuDescription)
