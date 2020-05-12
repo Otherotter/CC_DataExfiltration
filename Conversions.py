@@ -229,19 +229,6 @@ def deconstruct_packet(packet):
     return message
 
 
-def dummy_client(client_called:int): 
-    dummy = socket.socket()
-    index = client_called % len(popular_sites)
-    dummy.connect((popular_sites[index],80))
-    for i in range(randrange(15)):
-        dummy_packet = construct_dummy_packet(b'')
-        dummy.send(dummy_packet)
-    dummy.settimeout(100)
-    while 1:
-        dummy.recv(1024)  # receive response
-    dummy.close()  # close the connection
-    
-
 def construct_dummy_packet(packet:bytes):
     global raw_packet_bytes, popular_sites, packet_size
     original_packet_size = len(packet)

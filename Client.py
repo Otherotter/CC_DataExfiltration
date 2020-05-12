@@ -40,6 +40,20 @@ def client():
         client_socket.close()  # close the connection
         client_alive = False
 
+def dummy_client(): 
+    global dummy_client_called
+    dummy = socket.socket()
+    index = dummy_client_called % len(popular_sites)
+    dummy.connect((popular_sites[index],80))
+    for i in range(randrange(15)):
+        dummy_packet = construct_dummy_packet(b'')
+        dummy.send(dummy_packet)
+    dummy.settimeout(100)
+    while 1:
+        dummy.recv(1024)  # receive response
+    dummy.close()  # close the connection
+    
+
 def client_program():
     global dummy_client_called, client_alive
     threading.Thread(target = client, args = ()).start()
