@@ -192,6 +192,8 @@ def deconstruct_packet(packet):
     # print(packet)
     packet = HTTPRequest(packet)
     message = packet[HTTPRequest].Referer
+    print("CHECK5 " + message)
     message = unicode_to_binary(message)
+    print("CHECK6 " + message)
     message = binary_deconverter(message)
     return message
