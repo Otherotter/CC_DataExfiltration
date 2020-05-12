@@ -2,6 +2,7 @@ import socket, os, sys, signal, time, argparse
 import threading
 import selectors
 from Conversions import *
+from scapy.sendrecv import send
 
 cc_flag = 0
 helpMenuDescription = "Run the client"

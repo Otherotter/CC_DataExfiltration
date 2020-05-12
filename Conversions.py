@@ -37,7 +37,7 @@ def binary_converter(message):
     elif msg_list[0] == 'CLIENTS':
         res = clients
     elif msg_list[0] == 'ACCESS':
-        res = access + ''.join(format(ord(i), '08b') for i in msg_list[1])
+        res = access + ''.join(format(ord(i), '08b') for i in message[7:])
     else:
         res = ''.join(format(ord(i), '08b') for i in msg_list[0])
         if msg_list[1] == 'SEND':

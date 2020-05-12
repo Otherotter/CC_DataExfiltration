@@ -3,6 +3,7 @@ import threading
 import socketserver
 import time
 from Conversions import *
+from scapy.sendrecv import send
 
 class ThreadedServerHandler (socketserver.BaseRequestHandler):
     def __init__(self, iterable):
@@ -48,15 +49,17 @@ class CommandCenter():
             device.send_message(self.menu())
             return
         ###what happans when you send the packet. Does the server communicate back to the infecting client?
+        
         if command == "SEND" and optional != None:
-            packet = construct_packet(device.address, command, optional)
-            device.send_message(optional)
+            entire_input = command + " " + optional
+            packet = construct_packet(device.address, entire_input)
+            device.send_message(packet)
         elif command == "DISCONNECT":
-            packet = construct_packet(device.address, command, optional)
+            packet = construct_packet(device.address, command)
             device.close()
         else:
-            packet = construct_packet(device.address, command, optional)
-            device.send_message("ECHO")
+            packet = construct_packet(device.address, "ECHO")
+            device.send_message(packet)
 
     def command(self, addr, command, optional=None):
         if command != "ECHO" and command != "SEND" and command != "DISCONNECT":
@@ -95,8 +98,7 @@ class ClientInfo():
         #print(passwoCrd)
         if(passwoCrd == "PASSWORD"):
             self.elevated = True 
-            self.send_message("ACCESS GRANTED, WELCOME!")
-            self.send_message(self.cc.menu())
+            self.send_message(construct_packet(self.address, "ACCESS GRANTED, WELCOME!"))
         else:
             self.elevated = False
 
@@ -107,6 +109,7 @@ class ClientInfo():
             self.client.send(message)
         else:
             self.client.send(message)
+            send(message)
 
     def close(self):
         self.client.close()
