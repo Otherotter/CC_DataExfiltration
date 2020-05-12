@@ -38,7 +38,7 @@ def client_program():
     threading.Thread(target = client, args = ()).start()
     while 1:
         i = input()
-        packet = construct_packet(['127.0.0.1', '2000'], i)
+        packet = construct_packet(list(client_socket.getpeername()), i)
         client_socket.send(packet)
         print(i)
 
