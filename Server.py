@@ -110,35 +110,35 @@ class ClientInfo():
         self.client.close()
 
 
-    def send_cc_message(self, message):
-        send = "\u0030"
-        disconnect = "\u0031"
-        clients = "\u0032"
-        echo = "\u0033"
-        drop = "\u0034"
-        space = "\u0020"
-        message = send + '\u200c' + space + '\u200c' + "\u0079\u0065\u0065"
-        # message = message.encode()
-        if len(message) <= 1024:
-            packet = HTTP() / HTTPRequest(
-                Referer=message
-            )
-            self.send_message("RECEIVED")
-            self.send_message(packet[HTTPRequest].Referer)
-            # read_cc_message(packet)
+    # def send_cc_message(self, message):
+    #     send = "\u0030"
+    #     disconnect = "\u0031"
+    #     clients = "\u0032"
+    #     echo = "\u0033"
+    #     drop = "\u0034"
+    #     space = "\u0020"
+    #     message = send + '\u200c' + space + '\u200c' + "\u0079\u0065\u0065"
+    #     # message = message.encode()
+    #     if len(message) <= 1024:
+    #         packet = HTTP() / HTTPRequest(
+    #             Referer=message
+    #         )
+    #         self.send_message("RECEIVED")
+    #         self.send_message(packet[HTTPRequest].Referer)
+    #         # read_cc_message(packet)
 
 
-    def read_cc_message(self, packet):
-        message2 = "message sent"
-        message = packet[HTTPRequest].Referer
-        if type(message) is not bytes:
-            message2 = message2.encode()
-            self.client.send(message2)
-            message = message.encode('utf-8', 'ignore')
-            self.client.send(message)
-        else:
-            self.client.send(message2)
-            self.client.send(message)
+    # def read_cc_message(self, packet):
+    #     message2 = "message sent"
+    #     message = packet[HTTPRequest].Referer
+    #     if type(message) is not bytes:
+    #         message2 = message2.encode()
+    #         self.client.send(message2)
+    #         message = message.encode('utf-8', 'ignore')
+    #         self.client.send(message)
+    #     else:
+    #         self.client.send(message2)
+    #         self.client.send(message)
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

