@@ -48,6 +48,7 @@ class CommandCenter():
             send(scapy_packet(device.address, entire_input))
         elif command == "DISCONNECT":
             packet = construct_packet(device.address, command)
+            device.send_message(packet)
             time.sleep(5)
             device.close()
         else:
