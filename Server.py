@@ -32,8 +32,10 @@ class CommandCenter():
         else:
             print("[CLIENTS] number of clients " + str(len(self.client_list)))
             for i in self.client_list:
-                construct_packet(device.address, str(i.address))
-                device.send_message(i.ip)
+                packet = construct_packet(device.address, str(i.address))
+                print("[CLIENTS] packet created")
+                device.send_message(packet)
+
   
     def excute_command(self, device, command, optional=None):
         if command != "SEND" and command != "DISCONNECT" and command != "ECHO":
