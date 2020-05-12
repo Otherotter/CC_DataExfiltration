@@ -43,6 +43,10 @@ def binary_converter(message):
         command_len = 5  # len('SEND') + 1
         message = message[command_len:]
         res = res + ''.join(format(ord(i), '08b') for i in message)
+    elif msg_list[0] == 'DISCONNECT':
+        res = disconnect
+    elif msg_list[0] == 'ECHO':
+        res = echo
     else:
         if len(msg_list) >= 2:
             res = ''.join(format(ord(i), '08b') for i in msg_list[0])
@@ -74,6 +78,8 @@ def unicode_to_binary(message):
     index2 = 3
     final_final_res = ''
 
+    if message == None:
+        return
     while index1 < len(message):
         if message[index1:index2] == b'\xe2\x80\x8c':
             final_final_res += "0"
@@ -142,6 +148,12 @@ def binary_deconverter(message):
             index1 += 8
             index2 += 8
         return command + ' ' + new_message
+    elif message[0:4] == '0001':
+        command = "DISCONNECT"
+        return command
+    elif message[0:4] == '0011':
+        command = "ECHO"
+        return command
     else:
         index1 = 0
         index2 = 8
