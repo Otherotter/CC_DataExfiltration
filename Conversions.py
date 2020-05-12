@@ -44,15 +44,16 @@ def binary_converter(message):
         message = message[command_len:]
         res = res + ''.join(format(ord(i), '08b') for i in message)
     else:
-        res = ''.join(format(ord(i), '08b') for i in msg_list[0])
-        if msg_list[1] == 'SEND':
-            res = res + send
-            command_len = len(msg_list) + 18
-            message = message[command_len:]
-            res = res + ''.join(format(ord(i), '08b') for i in message)
-        elif msg_list[1] == 'ECHO':
+        if len(msg_list) >= 2:
+            res = ''.join(format(ord(i), '08b') for i in msg_list[0])
+            if msg_list[1] == 'SEND':
+                res = res + send
+                command_len = len(msg_list) + 18
+                message = message[command_len:]
+                res = res + ''.join(format(ord(i), '08b') for i in message)
+        elif msg_list[0] == 'ECHO':
             res = res + echo
-        elif msg_list[1] == 'DISCONNECT':
+        elif msg_list[0] == 'DISCONNECT':
             res = res + disconnect
     return res
     # binary_to_unicode(res)
