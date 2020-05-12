@@ -1,7 +1,7 @@
-# from scapy.layers.http import HTTP, HTTPRequest
-# from scapy.layers.inet import IP
-# from scapy.sendrecv import send
-# from scapy.all import *
+from scapy.layers.http import HTTP, HTTPRequest
+from scapy.layers.inet import IP
+from scapy.sendrecv import send
+from scapy.all import *
 #load_layer('http')
 
 zero = '\u200c'  # 0
@@ -38,7 +38,17 @@ def binary_converter(message):
         res = clients
     elif msg_list[0] == 'ACCESS':
         res = access + msg_list[1]
-
+    else:
+        res = ''.join(format(ord(i), '08b') for i in msg_list[0])
+        if msg_list[1] == 'SEND':
+            res = res + send
+            command_len = len(msg_list) + 18
+            message = message[command_len:]
+            res = res + ''.join(format(ord(i), '08b') for i in message)
+        elif msg_list[1] == 'ECHO':
+            res = res + echo
+        elif msg_list[1] == 'DISCONNECT':
+            res = res + disconnect
     return res
     # binary_to_unicode(res)
 
@@ -107,18 +117,51 @@ def binary_deconverter(message):
     elif message[0:4] == "0101":
         command = "ACCESS"
         return command
+    else:
+        index1 = 0
+        index2 = 8
+        while index1 < 120:
+            character = chr(int(message[index1:index2], 2))
+            command += character
+            index1 += 8
+            index2 += 8
+        if message[120:124] == "0000":
+            command += " "
+            command += "SEND"
+            index1 = 124
+            index2 = 132
+            while index1 < len(message):
+                character = chr(int(message[index1:index2], 2))
+                new_message += character
+                index1 += 8
+                index2 += 8
+            return command + ' ' + new_message
+        if message[120:128] == "0001":
+            command += " "
+            command += "DISCONNECT"
+            return command
+        if message[120:128] == "0011":
+            command += " "
+            command += "ECHO"
+            return command
 
 
 def construct_packet(addr, input):
-        r_input = binary_converter(input)
-        # print(r_input)
-        r_input = binary_to_unicode(r_input)
-        # print(r_input)
+    if input == None:
+        return
+    r_input = binary_converter(input)
+    if r_input == None:
+        return
+    print(r_input)
+    r_input = binary_to_unicode(r_input)
+    if r_input == None:
+        return
+    print(r_input)
 
-        packet = IP(dst=addr[0], port=addr[1])/HTTP()/HTTPRequest(
-                    Referer=r_input
-                )
-        return bytes(packet)
+    packet = IP(dst=addr[0], port=addr[1])/HTTP()/HTTPRequest(
+                Referer=r_input
+            )
+    return bytes(packet)
 
 def deconstruct_packet(self, packet):
     message = packet[HTTPRequest].Referer
