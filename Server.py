@@ -71,18 +71,17 @@ class CommandCenter():
         else:
             addr = addr.split(":", 1)
             addr[1] = int(addr[1])
-            client = locateBy_(addr)
+            client = self.locateBy_(addr)
             if(client != None):
                 self.excute_command(client, command,optional)
 
     def insert(self, client):
         self.client_list.append(client)
     
-    def locateBy_(self, search, option):
-        if option == 0:
-            for i in self.client_list:
-                if i.ip == search:
-                    return i
+    def locateBy_(self, search):
+        for i in self.client_list:
+            if i.address == search:
+                return i
 
 class ClientInfo():
     def __init__(self, client, address):
