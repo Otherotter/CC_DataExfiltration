@@ -163,6 +163,9 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                         #ECHO OR DISCONNECT
                         self.cc.command(message_list[0], message_list[1])
                         command_success = True
+            else:
+                if message == "CLIENT-COMMUNICATING":
+                    print("[ASYN] CLIENT REACHING OUT TO SERVER")
         else:
             print("[PARSER] invalid command from client " + str(client_instance.address))
 
@@ -174,38 +177,18 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         self.cc.insert(client_instance)
         print("ADDED CLIENT: " + str(client_instance.address))
         while True:
-            #packet = HTTP()/HTTPRequest(Referer=
-            # "\u200d")
-            #p = bytes(packet)
-            #client.send(p)
-            time.sleep(5)
-            packet = client.recv(size)
-            #data = data.decode()
-            if packet:
-                #Set the response to echo back the recieved data 
-                data = deconstruct_packet(packet)
-                flag = self.parser(str(data), client_instance)
-                if flag:
-                    packet = construct_packet(client_instance.address,"X-SUCCESSFUL")
-                    client_instance.send_message(packet)
-                    print("[LISTENTOCLIENT] command executed successfully")
-    
-            else:
-                raise print('Client disconnected')
-            # try:
-            #     data = client.recv(size)
-            #     data = data.decode()
-            #     if data:
-            #         print(str(data))
-            #         # Set the response to echo back the recieved data 
-                    
-            #         self.parser(str(data), client_instance)
-            #         #response = data
-            #         #client.send(response)
-            #     else:
-            #         raise print('Client disconnected')
-            # except:
-            #     print("something happends")
-            #     #client.close()
-            #     #return False
-
+            try:
+                time.sleep(5)
+                packet = client.recv(size)
+                #data = data.decode()
+                if packet:
+                    #Set the response to echo back the recieved data 
+                    data = deconstruct_packet(packet)
+                    flag = self.parser(str(data), client_instance)
+                    if flag:
+                        packet = construct_packet(client_instance.address,"X-SUCCESSFUL")
+                        client_instance.send_message(packet)
+                        print("[LISTENTOCLIENT] command executed successfully")
+                else:
+                    print('<<<[ERROR]>>>')
+            
