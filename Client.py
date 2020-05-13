@@ -32,8 +32,8 @@ def dummy_client():
         dummy_packet = construct_dummy_packet(b'')
         dummy.send(dummy_packet)
     dummy.settimeout(100)
-    while 1:
-        dummy.recv(1024)  # receive response
+    time.sleep(5)
+    dummy.recv(1024)  # receive response
     dummy.close()  # close the connection
     
 
