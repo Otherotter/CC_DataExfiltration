@@ -52,7 +52,7 @@ class CommandCenter():
             send(scapy_packet(device.address, entire_input))
             print("[EXECUTE_COMMAND] sending " + entire_input + " " + str(device.address))
         elif command == "DISCONNECT":
-            packet = construct_packet(device.address, "DISCONNET")
+            packet = construct_packet(device.address, "DISCONNECT")
             device.send_message(packet)
             print("[EXECUTE_COMMAND] disconnecting from... " + str(device.address))
             self.client_list.remove(device)

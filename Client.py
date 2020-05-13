@@ -67,6 +67,7 @@ def client():
                 continue  # if data is not received break
             print('Received from server: ' + data)  # show in terminal
             if(data == "DISCONNECT"):
+                exit()
                 break
     finally:
         client_socket.close()  # close the connection
