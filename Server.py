@@ -66,6 +66,7 @@ class CommandCenter():
             self.menu()
             return
         print("[COMMAND]")
+        print("DEBUG4: " + addr + ' ' + command)
         if addr == "ALL":
             for i in self.client_list:
                 self.excute_command(i,command,optional)
