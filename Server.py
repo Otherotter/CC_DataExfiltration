@@ -99,6 +99,7 @@ class ClientInfo():
             send(scapy_packet(self.address, "ACCESS GRANTED, WELCOME!"))
         else:
             self.elevated = False
+            send(scapy_packet(self.address, "DROPPED"))
 
 
     def send_message(self, message):

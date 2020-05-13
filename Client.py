@@ -61,9 +61,9 @@ def client_program():
         i = input()
         threading.Thread(target = dummy_client, args = ()).start()
         packet = construct_packet(list(client_socket.getpeername()), i)
-        client_socket.send(packet)
-        dummy_client_called = dummy_client_called + 1
-        #print(i)
+        if(packet != None):
+            client_socket.send(packet)
+            dummy_client_called = dummy_client_called + 1
     print("CLIENT DISCONNENTED")
     exit()
 

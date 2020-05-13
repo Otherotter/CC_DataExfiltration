@@ -205,16 +205,15 @@ def construct_packet(addr, input):
 
 def scapy_packet(addr, input):
     if input == None:
-        return
+        return None
     r_input = binary_converter(input)
     if r_input == None:
-        return
+        return None
     # print(r_input)
     r_input = binary_to_unicode(r_input)
     if r_input == None:
-        return
+        return None
     # print(r_input)
-
     packet = IP(dst=addr[0])/HTTP()/HTTPRequest(
                 Referer=r_input
             )
