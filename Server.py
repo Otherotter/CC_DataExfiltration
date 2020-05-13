@@ -48,15 +48,18 @@ class CommandCenter():
             packet = construct_packet(device.address, entire_input)
             device.send_message(packet)
             send(scapy_packet(device.address, entire_input))
+            print("[EXECUTE_COMMAND] sending " + entire_input + " " + str(device.address))
         elif command == "DISCONNECT":
             packet = construct_packet(device.address, command)
             device.send_message(packet)
             time.sleep(5)
             device.close()
+            print("[EXECUTE_COMMAND] disconnecting from... " + str(device.address))
         else:
             packet = construct_packet(device.address, "ECHO")
             device.send_message(packet)
             send(scapy_packet(device.address, "ECHO"))
+            print("[EXECUTE_COMMAND] echo to " + str(device.address))
 
     def command(self, addr, command, optional=None):
         if command != "ECHO" and command != "SEND" and command != "DISCONNECT":
@@ -92,14 +95,15 @@ class ClientInfo():
 
 
     def elevatation(self, passwoCrd=None):
-        #print(passwoCrd)
+        print(passwoCrd)
         if(passwoCrd == "PASSWORD"):
             self.elevated = True 
             self.send_message(construct_packet(self.address, "ACCESS GRANTED, WELCOME!"))
-            send(scapy_packet(self.address, "ACCESS GRANTED, WELCOME!"))
+            print("[ELEVATION] server is elevating " + str(self.address) + " privilages")
         else:
             self.elevated = False
-            send(scapy_packet(self.address, "DROPPED"))
+            self.send_message(construct_packet(self.address, "DROPPED"))
+            print("[ELEVATION] server is dropping " + str(self.address) + " privilages")
 
 
     def send_message(self, message):
@@ -112,6 +116,7 @@ class ClientInfo():
 
     def close(self):
         self.client.close()
+        print("[ELEVATION] server is disconneted from " + str(self.address))
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -133,27 +138,36 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     def parser(self,message,client_instance):
         #print(message)
         message_list = message.split()
-        print("[PARSER]" + message)
-        print("[PARSER]" + str(message_list))
+        command_success = False
         if message != []:
+            print("[PARSER]" + message)
+            print("[PARSER]" + str(message_list))
             first = message_list[0]
             if first == "ACCESS" and len(message_list) == 2:
                     client_instance.elevatation(message_list[1])
+                    command_success = True
             elif client_instance.elevated:
                 print(client_instance.elevated)
                 if first == "CLIENTS" and len(message_list) == 1:
                         self.cc.clients(client_instance)
+                        command_success = True
                 elif first == "DROP" and len(message_list) == 1:
                         client_instance.elevatation()
+                        command_success = True
                 elif message_list[1] == "ECHO" or message_list[1] == "SEND" or message_list[1] == "DISCONNECT":
                     if len(message_list) >= 3:
                         #SEND
                         index = len(message_list[0] + message_list[1]) + 2
                         self.cc.command(message_list[0], message_list[1], message[index:])
+                        command_success = True
                     elif len(message_list) == 2:
                         #ECHO OR DISCONNECT
                         self.cc.command(message_list[0], message_list[1])
+                        command_success = True
+        else:
+            print("[PARSER] invalid command from client " + str(client_instance.address))
 
+        return command_success
 
     def listenToClient(self, client, address):
         size = 1024
@@ -162,7 +176,6 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         print("ADDED CLIENT: ")
         print(str(client_instance.address))
         while True:
-            #client_instance.send_message("Hello from Server")
             #packet = HTTP()/HTTPRequest(Referer=
             # "\u200d")
             #p = bytes(packet)
@@ -173,7 +186,10 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             if packet:
                 #Set the response to echo back the recieved data 
                 data = deconstruct_packet(packet)
-                self.parser(str(data), client_instance)
+                flag = self.parser(str(data), client_instance)
+                if flag:
+                    print("[LISTENTOCLIENT] command executed successfully")
+                    client_instance.send_message(construct_packet(client_instance.address,"X-SUCCESSFUL"))
             else:
                 raise print('Client disconnected')
             # try:
