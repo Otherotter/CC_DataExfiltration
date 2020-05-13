@@ -85,8 +85,9 @@ def client_program():
         if(packet != None):
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
-        #predio.join()
+        predio.join()
     print("CLIENT OFFLINE")
+    client_socket.close()
     #clie.join()
     exit()
 
