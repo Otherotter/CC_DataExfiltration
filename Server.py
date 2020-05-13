@@ -173,14 +173,13 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         size = 1024
         client_instance = ClientInfo(client, address)
         self.cc.insert(client_instance)
-        print("ADDED CLIENT: ")
-        print(str(client_instance.address))
+        print("ADDED CLIENT: " + str(client_instance.address))
         while True:
             #packet = HTTP()/HTTPRequest(Referer=
             # "\u200d")
             #p = bytes(packet)
             #client.send(p)
-            time.sleep(2)
+            time.sleep(5)
             packet = client.recv(size)
             #data = data.decode()
             if packet:
@@ -188,8 +187,10 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                 data = deconstruct_packet(packet)
                 flag = self.parser(str(data), client_instance)
                 if flag:
+                    packet = construct_packet(client_instance.address,"X-SUCCESSFUL")
+                    client_instance.send_message(packet)
                     print("[LISTENTOCLIENT] command executed successfully")
-                    client_instance.send_message(construct_packet(client_instance.address,"X-SUCCESSFUL"))
+    
             else:
                 raise print('Client disconnected')
             # try:
