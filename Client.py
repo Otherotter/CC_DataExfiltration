@@ -43,10 +43,13 @@ def asyn_contact():
     while client_alive:
         elapsed_time = time.time() - start
         if(elapsed_time > 60):
-            start = time.time()
+            predio1 = threading.Thread(target = dummy_client, args = ())
+            predio1.start()
             packet = construct_packet(list(client_socket.getpeername()), "CLIENT-COMMUNICATING")
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
+            start = time.time()
+            predio1.join()
 
 def client():
     global client_socket, port, hostname,dummy_client_called,client_alive # contains hostname and port number
@@ -72,15 +75,19 @@ def client():
 
 def client_program():
     global dummy_client_called, client_alive
-    threading.Thread(target = client, args = ()).start()
+    clie = threading.Thread(target = client, args = ())
+    clie.start()
     while client_alive:
         i = input()
-        threading.Thread(target = dummy_client, args = ()).start()
+        predio = threading.Thread(target = dummy_client, args = ())
+        predio.start()
         packet = construct_packet(list(client_socket.getpeername()), i)
         if(packet != None):
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
+        predio.join()
     print("CLIENT OFFLINE")
+    clie.join()
     exit()
 
 def init():
