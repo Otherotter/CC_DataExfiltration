@@ -133,6 +133,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         #print(message)
         message_list = message.split()
         print("[PARSER]" + message)
+        print("[PARSER]" + str(message_list))
         if message != []:
             first = message_list[0]
             if first == "ACCESS" and len(message_list) == 2:
@@ -141,7 +142,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                 print(client_instance.elevated)
                 if first == "CLIENTS" and len(message_list) == 1:
                         self.cc.clients(client_instance)
-                elif first == "DROP" and len(message) == 1:
+                elif first == "DROP" and len(message_list) == 1:
                         client_instance.elevatation()
                 elif message_list[1] == "ECHO" or message_list[1] == "SEND" or message_list[1] == "DISCONNECT":
                     if len(message_list) >= 3:
