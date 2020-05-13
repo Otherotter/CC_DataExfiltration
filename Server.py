@@ -184,5 +184,19 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             try:
                 time.sleep(5)
                 packet = client.recv(size)
+                # data = data.decode()
+                if packet:
+                    # Set the response to echo back the recieved data
+                    data = deconstruct_packet(packet)
+                    flag = self.parser(str(data), client_instance)
+                    if flag:
+                        packet = construct_packet(client_instance.address, "X-SUCCESSFUL")
+                        client_instance.send_message(packet)
+                        print("[LISTENTOCLIENT] command executed successfully")
+                else:
+                    print('<<<[ERROR]>>>')
+            except:
+                print('<<<[ERROR]>>>')
+
                 
             
