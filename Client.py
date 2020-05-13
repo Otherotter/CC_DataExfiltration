@@ -43,7 +43,7 @@ def asyn_contact():
     while client_alive:
         elapsed_time = time.time() - start
         if(elapsed_time > 60):
-            start_time = time.time()
+            start = time.time()
             packet = construct_packet(list(client_socket.getpeername()), "CLIENT-COMMUNICATING")
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
