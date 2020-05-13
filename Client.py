@@ -63,7 +63,9 @@ def client():
             if not data:
                 continue  # if data is not received break
             print('Received from server: ' + data)  # show in terminal
-    except:
+            if(data == "DISCONNECT"):
+                break
+    finally:
         client_socket.close()  # close the connection
         client_alive = False
         asyn_communication.join()
@@ -78,7 +80,7 @@ def client_program():
         if(packet != None):
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
-    print("CLIENT DISCONNENTED")
+    print("CLIENT OFFLINE")
     exit()
 
 def init():
