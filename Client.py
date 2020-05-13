@@ -67,12 +67,11 @@ def client():
                 continue  # if data is not received break
             print('Received from server: ' + data)  # show in terminal
             if(data == "DISCONNECT"):
-                exit()
                 break
     finally:
         client_socket.close()  # close the connection
         client_alive = False
-        asyn_communication.join()
+        #asyn_communication.join()
 
 def client_program():
     global dummy_client_called, client_alive
@@ -86,9 +85,9 @@ def client_program():
         if(packet != None):
             client_socket.send(packet)
             dummy_client_called = dummy_client_called + 1
-        predio.join()
+        #predio.join()
     print("CLIENT OFFLINE")
-    clie.join()
+    #clie.join()
     exit()
 
 def init():
