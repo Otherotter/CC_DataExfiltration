@@ -50,11 +50,9 @@ class CommandCenter():
             send(scapy_packet(device.address, entire_input))
             print("[EXECUTE_COMMAND] sending " + entire_input + " " + str(device.address))
         elif command == "DISCONNECT":
-            packet = construct_packet(device.address, command)
-            device.send_message(packet)
-            time.sleep(5)
-            device.close()
             print("[EXECUTE_COMMAND] disconnecting from... " + str(device.address))
+            time.sleep(1)
+            device.close()
         else:
             packet = construct_packet(device.address, "ECHO")
             device.send_message(packet)
@@ -117,7 +115,7 @@ class ClientInfo():
 
     def close(self):
         self.client.close()
-        print("[ELEVATION] server is disconneted from " + str(self.address))
+        print("[CLOSE] server is disconneted from " + str(self.address))
 
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
