@@ -191,4 +191,5 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                         print("[LISTENTOCLIENT] command executed successfully")
                 else:
                     print('<<<[ERROR]>>>')
-            
+            except:
+                print('<<<[ERROR]>>>')
