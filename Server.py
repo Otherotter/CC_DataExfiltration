@@ -52,8 +52,11 @@ class CommandCenter():
             send(scapy_packet(device.address, entire_input))
             print("[EXECUTE_COMMAND] sending " + entire_input + " " + str(device.address))
         elif command == "DISCONNECT":
+            packet = construct_packet(device.address, "DISCONNET")
+            device.send_message(packet)
             print("[EXECUTE_COMMAND] disconnecting from... " + str(device.address))
-            time.sleep(1)
+            self.client_list.remove(device)
+            time.sleep(3)
             device.close()
         else:
             packet = construct_packet(device.address, "ECHO")
@@ -165,7 +168,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                         command_success = True
             else:
                 if message == "CLIENT-COMMUNICATING":
-                    print("[ASYN] CLIENT REACHING OUT TO SERVER")
+                    print("[ASYN] CLIENT" + str(client_instance.address) + "REACHING OUT TO SERVER")
         else:
             print("[PARSER] invalid command from client " + str(client_instance.address))
 
@@ -176,20 +179,10 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         client_instance = ClientInfo(client, address)
         self.cc.insert(client_instance)
         print("ADDED CLIENT: " + str(client_instance.address))
+        buffer = None
         while True:
             try:
                 time.sleep(5)
                 packet = client.recv(size)
-                #data = data.decode()
-                if packet:
-                    #Set the response to echo back the recieved data 
-                    data = deconstruct_packet(packet)
-                    flag = self.parser(str(data), client_instance)
-                    if flag:
-                        packet = construct_packet(client_instance.address,"X-SUCCESSFUL")
-                        client_instance.send_message(packet)
-                        print("[LISTENTOCLIENT] command executed successfully")
-                else:
-                    print('<<<[ERROR]>>>')
-            except:
-                print('<<<[ERROR]>>>')
+                
+            
