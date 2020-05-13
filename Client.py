@@ -23,8 +23,35 @@ def client_input(client_socket):
     a = input()
     print(a)
 
+def dummy_client(): 
+    global dummy_client_called
+    dummy = socket.socket()
+    index = dummy_client_called % len(popular_sites)
+    dummy.connect((popular_sites[index],80))
+    for i in range(randrange(15)):
+        dummy_packet = construct_dummy_packet(b'')
+        dummy.send(dummy_packet)
+    dummy.settimeout(100)
+    while 1:
+        dummy.recv(1024)  # receive response
+    dummy.close()  # close the connection
+    
+
+def asyn_contact():
+    global dummy_client_called, client_alive
+    start = time.time()
+    while client_alive:
+        elapsed_time = time.time() - start
+        if(elapsed_time > 60):
+            start_time = time.time()
+            packet = construct_packet(list(client_socket.getpeername()), "CLIENT-COMMUNICATING")
+            client_socket.send(packet)
+            dummy_client_called = dummy_client_called + 1
+
 def client():
     global client_socket, port, hostname,dummy_client_called,client_alive # contains hostname and port number
+    asyn_communication = threading.Thread(target = asyn_contact, args = ())
+    asyn_communication.start()
     try:
         client_socket = socket.socket()  # instantiate
         #client_socket.settimeout()
@@ -39,20 +66,7 @@ def client():
     except:
         client_socket.close()  # close the connection
         client_alive = False
-
-def dummy_client(): 
-    global dummy_client_called
-    dummy = socket.socket()
-    index = dummy_client_called % len(popular_sites)
-    dummy.connect((popular_sites[index],80))
-    for i in range(randrange(15)):
-        dummy_packet = construct_dummy_packet(b'')
-        dummy.send(dummy_packet)
-    dummy.settimeout(100)
-    while 1:
-        dummy.recv(1024)  # receive response
-    dummy.close()  # close the connection
-    
+        asyn_communication.join()
 
 def client_program():
     global dummy_client_called, client_alive
