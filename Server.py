@@ -32,7 +32,7 @@ class CommandCenter():
         else:
             print("[CLIENTS] number of clients " + str(len(self.client_list)))
             for i in self.client_list:
-                msg = i.address[0] + ':' + i.address[1]
+                msg = str(i.address[0]) + ':' + str(i.address[1])
                 print("DEBUG1: " + msg)
                 packet = construct_packet(device.address, msg)
                 print("[CLIENTS] packet created")
